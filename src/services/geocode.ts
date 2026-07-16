@@ -27,6 +27,12 @@ export async function geocodeCaption(caption: string): Promise<GeocodeResult | n
 function extractPlaceKeywords(text: string): string[] {
   const candidates: string[] = [];
 
+  // Look for 📍 pin address — full address line
+  const pinAddress = text.match(/📍([^\n]+)/);
+  if (pinAddress) {
+    candidates.push(pinAddress[1].trim());
+  }
+
   // Look for Korean place patterns: XX동, XX구, XX시, XX역, XX카페, XX맛집
   const koreanPlace = text.match(
     /[\uac00-\ud7af\ud7b0-\ud7ff]{2,}(?:동|구|시|역|카페|맛집|거리|로|길|산|천|대|교|시장|공원|호수|바다|해변|빌딩|타워|아파트)/g
@@ -57,7 +63,7 @@ function extractPlaceKeywords(text: string): string[] {
 }
 
 /** Single Nominatim geocode request */
-async function geocodeSearch(query: string): Promise<GeocodeResult | null> {
+export async function geocodeSearch(query: string): Promise<GeocodeResult | null> {
   const url = new URL("https://nominatim.openstreetmap.org/search");
   url.searchParams.set("q", query);
   url.searchParams.set("format", "json");

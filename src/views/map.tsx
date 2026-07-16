@@ -13,20 +13,24 @@ export const MapPage = ({ bookmarks }: { bookmarks: Bookmark[] }) => {
       createdAt: b.createdAt,
     }));
 
+  const markersJson = JSON.stringify(markers);
+
   return (
     <div>
       <div id="map" />
       <div class="marker-list" id="marker-list" hx-get="/markers" hx-trigger="load" hx-swap="innerHTML">
         <div class="empty">로딩 중...</div>
       </div>
-      <script>{`
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
         var map = L.map('map').setView([37.5665, 126.978], 12);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '&copy; OpenStreetMap contributors',
           maxZoom: 18,
         }).addTo(map);
 
-        var markers = ${JSON.stringify(markers)};
+        var markers = ${markersJson};
         var bounds = [];
         markers.forEach(function(m) {
           var marker = L.marker([m.lat, m.lng]).addTo(map);
@@ -41,7 +45,9 @@ export const MapPage = ({ bookmarks }: { bookmarks: Bookmark[] }) => {
         if (bounds.length > 0) {
           map.fitBounds(bounds, { padding: [50, 50] });
         }
-      `}</script>
+      `,
+        }}
+      />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { db, schema } from "../db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, ne } from "drizzle-orm";
 import { Layout } from "../views/layout";
 import { MapPage } from "../views/map";
 import { MarkerCards } from "../views/partials";
@@ -11,6 +11,7 @@ web.get("/", async (c) => {
   const bookmarks = await db
     .select()
     .from(schema.bookmarks)
+    .where(ne(schema.bookmarks.geocodeStatus, "failed"))
     .orderBy(desc(schema.bookmarks.createdAt))
     .limit(100);
 
@@ -25,6 +26,7 @@ web.get("/markers", async (c) => {
   const bookmarks = await db
     .select()
     .from(schema.bookmarks)
+    .where(ne(schema.bookmarks.geocodeStatus, "failed"))
     .orderBy(desc(schema.bookmarks.createdAt))
     .limit(100);
 
